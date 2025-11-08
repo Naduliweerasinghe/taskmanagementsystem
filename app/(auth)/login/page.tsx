@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { supabase } from "../../../lib/supabase"
 import { cn } from "@/styles/lib/utils"
@@ -36,8 +37,8 @@ export default function LoginPage() {
         return
       }
 
-  // Successful login: redirect to dashboard
-  router.push("/dashboard")
+  // Successful login: redirect to home page
+  router.push("/")
     } catch (err: any) {
       setErrorMsg(err?.message ?? String(err))
     } finally {
@@ -91,6 +92,9 @@ export default function LoginPage() {
 
           <div className="text-sm text-center text-gray-600">
             Don't have an account? <a href="/signup" className="font-medium text-blue-600 hover:underline">Sign up</a>
+          </div>
+          <div className="text-sm text-center mt-2">
+            <Link href="/forgot-password" className="font-medium text-blue-600 hover:underline">Forgot password?</Link>
           </div>
         </form>
       </div>

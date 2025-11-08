@@ -81,6 +81,7 @@ export default function NavBar() {
   }
 
   const meta = getPageMeta()
+  const isActive = (p: string) => pathname.startsWith(p)
 
   return (
     <header className="w-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700">
@@ -92,12 +93,21 @@ export default function NavBar() {
               <Image src="/Logo.png" alt="logo" width={40} height={40} className="rounded-md object-contain" />
               <span className="font-semibold text-lg text-gray-800 dark:text-gray-100">Task Management System</span>
             </Link>
-            <div className="hidden sm:flex items-center ml-4 text-sm text-gray-600 dark:text-gray-300">
-              <span className="inline-flex items-center text-gray-700 dark:text-gray-200">{meta.icon}<span className="align-middle">{meta.name}</span></span>
+            <div className="hidden sm:flex items-center ml-4 text-sm text-gray-600 dark:text-gray-300 absolute left-1/2 transform -translate-x-1/2 z-10 pointer-events-none">
+              <span className="inline-flex items-center text-gray-700 dark:text-gray-200 pointer-events-auto">{meta.icon}<span className="align-middle">{meta.name}</span></span>
             </div>
           </div>
 
           <nav className="flex items-center gap-3">
+            {/* Primary links */}
+            <div className="hidden sm:flex items-center gap-2 mr-2">
+              <Link href="/dashboard" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/dashboard") ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>
+                Dashboard
+              </Link>
+              <Link href="/tasks" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/tasks") ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>
+                Tasks
+              </Link>
+            </div>
             {!session ? (
               // logged out: on home show sign in/up, else show sign in
               pathname === "/" ? (

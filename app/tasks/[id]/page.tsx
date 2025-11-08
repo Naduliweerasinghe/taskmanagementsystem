@@ -63,13 +63,7 @@ export default function TaskDetailsPage() {
       <div className="max-w-3xl mx-auto px-4 md:px-8 py-8">
         <div className="mb-4 flex items-center gap-3">
           <Link href="/tasks" className="text-sm text-indigo-600 hover:underline">← Back to tasks</Link>
-          <button
-            type="button"
-            onClick={() => router.push('/dashboard')}
-            className="text-sm px-3 py-1 bg-gray-100 dark:bg-slate-700 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600"
-          >
-            Back to dashboard
-          </button>
+          
         </div>
 
         <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-6 shadow-sm">
@@ -83,23 +77,32 @@ export default function TaskDetailsPage() {
               <>
                 <button onClick={markCompleted} className="px-4 py-2 bg-emerald-500 text-white rounded-md">Mark completed</button>
                 <button
-                  type="button"
-                  onClick={() => router.push('/dashboard')}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                  onClick={() => router.push(`/tasks/${task.id}/edit`)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
-                  Back
+                  Update
                 </button>
+                
               </>
             ) : (
               <>
                 <div className="text-sm text-green-600">This task is completed.</div>
-                <button
-                  type="button"
-                  onClick={() => router.push('/dashboard')}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-                >
-                  Back
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => router.push(`/tasks/${task.id}/edit`)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Update
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => router.push('/dashboard')}
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                  >
+                    Back
+                  </button>
+                </div>
               </>
             )}
           </div>

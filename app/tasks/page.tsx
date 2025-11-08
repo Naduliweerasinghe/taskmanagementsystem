@@ -29,6 +29,7 @@ export default function TasksPage() {
   const [sessionUserId, setSessionUserId] = useState<string | null>(null)
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
   const [bulkLoading, setBulkLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const fetchLists = async (userId: string | null) => {
     setLoading(true)
@@ -142,6 +143,33 @@ export default function TasksPage() {
     }
   }
 
+  const deleteSelectedTasks = async () => {
+    if (selectedTaskIds.length === 0) return
+    if (!confirm(`Delete ${selectedTaskIds.length} selected task(s)? This cannot be undone.`)) return
+    setDeleteLoading(true)
+    try {
+      const { error } = await supabase.from('tasks').delete().in('id', selectedTaskIds)
+      if (error) throw error
+
+      // remove deleted tasks from local state
+      setTasksByList((prev) => {
+        const next: Record<string, Task[]> = {}
+        for (const k of Object.keys(prev)) {
+          next[k] = prev[k].filter((t) => !selectedTaskIds.includes(t.id))
+        }
+        return next
+      })
+
+      // clear selection
+      setSelectedTaskIds([])
+    } catch (e) {
+      console.error('Failed to delete selected tasks:', e)
+      alert('Failed to delete tasks. See console for details.')
+    } finally {
+      setDeleteLoading(false)
+    }
+  }
+
   useEffect(() => {
     ;(async () => {
       const {
@@ -242,7 +270,7 @@ export default function TasksPage() {
           <div className="flex items-center gap-3">
             <Link href="/tasks/add" className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Add Task</Link>
             <Link href="/tasks/create-list" className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Create List</Link>
-            <Link href="/tasks/completed" className="inline-flex items-center px-4 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600">Complete Task</Link>
+            <Link href="/tasks/completed" className="inline-flex items-center px-4 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600">Completed Task</Link>
             {/* debug helper removed */}
           </div>
         </div>
@@ -391,20 +419,30 @@ export default function TasksPage() {
         {/* Bulk complete action button - appears when tasks are selected */}
         {selectedTaskIds.length > 0 ? (
           <div className="fixed bottom-6 left-0 right-0 flex justify-center z-50">
-            <button
-              onClick={completeSelectedTasks}
-              disabled={bulkLoading}
-              className="inline-flex items-center px-6 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 disabled:opacity-60"
-            >
-              {bulkLoading ? "Completing..." : `Complete (${selectedTaskIds.length})`}
-            </button>
+            <div className="inline-flex items-center gap-3">
+              <button
+                onClick={completeSelectedTasks}
+                disabled={bulkLoading}
+                className="inline-flex items-center px-5 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 disabled:opacity-60"
+              >
+                {bulkLoading ? "Completing..." : `Complete (${selectedTaskIds.length})`}
+              </button>
+
+              <button
+                onClick={deleteSelectedTasks}
+                disabled={deleteLoading}
+                className="inline-flex items-center px-5 py-3 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 disabled:opacity-60"
+              >
+                {deleteLoading ? "Deleting..." : `Delete (${selectedTaskIds.length})`}
+              </button>
+            </div>
           </div>
         ) : null}
         {/* Back button (fixed bottom-left) */}
         <button
           type="button"
           onClick={() => router.push('/dashboard')}
-          className="fixed bottom-6 left-6 z-50 inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow hover:bg-gray-300"
+          className="fixed bottom-6 left-4 md:left-8 lg:left-[calc(50%-36rem+2rem)] z-50 inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow hover:bg-gray-300"
         >
           Back
         </button>
