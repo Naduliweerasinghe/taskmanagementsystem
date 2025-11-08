@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { supabase } from "../../lib/supabase"
 
 type List = {
@@ -17,9 +18,11 @@ type Task = {
   description?: string | null
   completed?: boolean
   created_at?: string
+  due_date?: string | null
 }
 
 export default function TasksPage() {
+  const router = useRouter()
   const [lists, setLists] = useState<List[]>([])
   const [tasksByList, setTasksByList] = useState<Record<string, Task[]>>({})
   const [loading, setLoading] = useState(true)
@@ -52,7 +55,7 @@ export default function TasksPage() {
       // only fetch tasks that are not completed for the main tasks view
       const { data, error } = await supabase
         .from("tasks")
-        .select("id,name,list_id,description,completed,created_at,user_id")
+        .select("id,name,list_id,description,completed,created_at,user_id,due_date")
         .eq("user_id", userId)
         .eq("completed", false)
         .order("created_at", { ascending: true })
@@ -212,6 +215,17 @@ export default function TasksPage() {
     }
   }, [])
 
+  // helper: remaining tasks count
+  const remainingCount = Object.values(tasksByList).reduce((sum, arr) => sum + (arr?.length ?? 0), 0)
+
+  const isDueSoon = (due?: string | null) => {
+    if (!due) return false
+    const dueMs = new Date(due).getTime()
+    const now = Date.now()
+    // within 24 hours (including overdue)
+    return dueMs - now <= 24 * 60 * 60 * 1000
+  }
+
   // (debug helper removed)
 
   return (
@@ -221,6 +235,8 @@ export default function TasksPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Tasks</h1>
             <p className="text-sm text-gray-600 dark:text-gray-300">Your tasks and lists.</p>
+            {/* Remaining tasks count */}
+            <div className="mt-1 text-sm text-gray-700 dark:text-gray-300">{remainingCount} remaining</div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -248,21 +264,35 @@ export default function TasksPage() {
                 <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">{lists[0].name}</h2>
                 {tasksByList[lists[0].id] && tasksByList[lists[0].id].length > 0 ? (
                   <ul className="space-y-2">
-                    {tasksByList[lists[0].id].map((t) => (
-                      <li key={t.id} className="p-2 rounded-md bg-gray-50 dark:bg-slate-900 border flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          aria-label={`Select ${t.name}`}
-                          onChange={() => toggleSelectTask(t.id)}
-                          checked={selectedTaskIds.includes(t.id)}
-                          className="mt-1 h-4 w-4"
-                        />
-                        <div>
-                          <div className="font-medium text-gray-800 dark:text-gray-100">{t.name}</div>
-                          {t.description ? <div className="text-sm text-gray-600 dark:text-gray-300">{t.description}</div> : null}
-                        </div>
-                      </li>
-                    ))}
+                    {tasksByList[lists[0].id].map((t) => {
+                          const dueSoon = isDueSoon(t.due_date)
+                          const liBg = dueSoon ? "bg-red-50 border-red-200 dark:bg-red-900/20" : "bg-gray-50 dark:bg-slate-900"
+                          return (
+                          <li
+                            key={t.id}
+                            className={`p-2 rounded-md ${liBg} border flex items-start gap-3 cursor-pointer`}
+                            onClick={() => router.push(`/tasks/${t.id}`)}
+                          >
+                            <input
+                              type="checkbox"
+                              aria-label={`Select ${t.name}`}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={() => toggleSelectTask(t.id)}
+                              checked={selectedTaskIds.includes(t.id)}
+                              className="mt-1 h-4 w-4"
+                            />
+                            <div>
+                              <div className="font-medium text-gray-800 dark:text-gray-100">{t.name}</div>
+                              {t.description ? <div className="text-sm text-gray-600 dark:text-gray-300">{t.description}</div> : null}
+                              {t.due_date ? (
+                                <div className={`text-xs mt-1 ${dueSoon ? 'text-red-700 dark:text-red-300' : 'text-gray-600 dark:text-gray-300'}`}>
+                                  Due: {new Date(t.due_date).toLocaleString()}
+                                </div>
+                              ) : null}
+                            </div>
+                          </li>
+                        )
+                        })}
                   </ul>
                 ) : (
                   <div className="text-sm text-gray-600 dark:text-gray-300">(No tasks in this list yet)</div>
@@ -277,11 +307,19 @@ export default function TasksPage() {
                     <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">{l.name}</h2>
                     {tasksByList[l.id] && tasksByList[l.id].length > 0 ? (
                       <ul className="space-y-2">
-                        {tasksByList[l.id].map((t) => (
-                          <li key={t.id} className="p-2 rounded-md bg-gray-50 dark:bg-slate-900 border flex items-start gap-3">
+                        {tasksByList[l.id].map((t) => {
+                          const dueSoon = isDueSoon(t.due_date)
+                          const liBg = dueSoon ? "bg-red-50 border-red-200 dark:bg-red-900/20" : "bg-gray-50 dark:bg-slate-900"
+                          return (
+                          <li
+                            key={t.id}
+                            className={`p-2 rounded-md ${liBg} border flex items-start gap-3 cursor-pointer`}
+                            onClick={() => router.push(`/tasks/${t.id}`)}
+                          >
                             <input
                               type="checkbox"
                               aria-label={`Select ${t.name}`}
+                              onClick={(e) => e.stopPropagation()}
                               onChange={() => toggleSelectTask(t.id)}
                               checked={selectedTaskIds.includes(t.id)}
                               className="mt-1 h-4 w-4"
@@ -289,9 +327,15 @@ export default function TasksPage() {
                             <div>
                               <div className="font-medium text-gray-800 dark:text-gray-100">{t.name}</div>
                               {t.description ? <div className="text-sm text-gray-600 dark:text-gray-300">{t.description}</div> : null}
+                              {t.due_date ? (
+                                <div className={`text-xs mt-1 ${dueSoon ? 'text-red-700 dark:text-red-300' : 'text-gray-600 dark:text-gray-300'}`}>
+                                  Due: {new Date(t.due_date).toLocaleString()}
+                                </div>
+                              ) : null}
                             </div>
                           </li>
-                        ))}
+                        )
+                        })}
                       </ul>
                     ) : (
                       <div className="text-sm text-gray-600 dark:text-gray-300">(No tasks in this list yet)</div>
@@ -311,11 +355,19 @@ export default function TasksPage() {
             <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-6 shadow-sm">
               <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Unlisted Tasks</h2>
               <ul className="space-y-2">
-                {tasksByList["__nolst__"].map((t) => (
-                  <li key={t.id} className="p-2 rounded-md bg-gray-50 dark:bg-slate-900 border flex items-start gap-3">
+                {tasksByList["__nolst__"].map((t) => {
+                  const dueSoon = isDueSoon(t.due_date)
+                  const liBg = dueSoon ? "bg-red-50 border-red-200 dark:bg-red-900/20" : "bg-gray-50 dark:bg-slate-900"
+                  return (
+                  <li
+                    key={t.id}
+                    className={`p-2 rounded-md ${liBg} border flex items-start gap-3 cursor-pointer`}
+                    onClick={() => router.push(`/tasks/${t.id}`)}
+                  >
                     <input
                       type="checkbox"
                       aria-label={`Select ${t.name}`}
+                      onClick={(e) => e.stopPropagation()}
                       onChange={() => toggleSelectTask(t.id)}
                       checked={selectedTaskIds.includes(t.id)}
                       className="mt-1 h-4 w-4"
@@ -323,9 +375,15 @@ export default function TasksPage() {
                     <div>
                       <div className="font-medium text-gray-800 dark:text-gray-100">{t.name}</div>
                       {t.description ? <div className="text-sm text-gray-600 dark:text-gray-300">{t.description}</div> : null}
+                      {t.due_date ? (
+                        <div className={`text-xs mt-1 ${dueSoon ? 'text-red-700 dark:text-red-300' : 'text-gray-600 dark:text-gray-300'}`}>
+                          Due: {new Date(t.due_date).toLocaleString()}
+                        </div>
+                      ) : null}
                     </div>
                   </li>
-                ))}
+                )
+                })}
               </ul>
             </div>
           </div>
@@ -342,6 +400,14 @@ export default function TasksPage() {
             </button>
           </div>
         ) : null}
+        {/* Back button (fixed bottom-left) */}
+        <button
+          type="button"
+          onClick={() => router.push('/dashboard')}
+          className="fixed bottom-6 left-6 z-50 inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow hover:bg-gray-300"
+        >
+          Back
+        </button>
       </div>
     </div>
   )

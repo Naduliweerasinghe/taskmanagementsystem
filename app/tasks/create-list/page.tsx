@@ -20,8 +20,16 @@ export default function CreateListPage() {
       } = await supabase.auth.getSession()
       const userId = session?.user?.id ?? null
 
-      const payload: any = { name }
-      if (userId) payload.user_id = userId
+      // If there's no authenticated session, stop early to avoid RLS failures.
+      // This commonly happens if the client's auth state is lost or the user switched accounts.
+      if (!userId) {
+        // Give actionable feedback and send user to the login page
+        alert("You must be signed in to create a list. Please sign in and try again.")
+        router.push("/login")
+        return
+      }
+
+      const payload: any = { name, user_id: userId }
 
       const { data, error } = await supabase.from("lists").insert([payload])
       if (error) throw error
