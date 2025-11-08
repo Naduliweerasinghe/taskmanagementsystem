@@ -58,8 +58,41 @@ export default function SignupPage() {
         }
       }
 
-  // Redirect to dashboard after signup
-  router.push("/dashboard")
+      // If signUp did not create a session (common when email confirmation is required),
+      // attempt to sign in immediately so the user can use the app without an extra step.
+      // If sign-in fails because confirmation is required, surface a helpful message.
+      let finalSession = data?.session ?? null
+      if (!finalSession) {
+        try {
+          const signInRes = await supabase.auth.signInWithPassword({
+            email: values.email,
+            password: values.password
+          })
+          if (signInRes.error) {
+            // If the provider requires email confirmation, tell the user.
+            if (signInRes.error.message?.toLowerCase().includes("confirm") || signInRes.error.status === 400) {
+              setErrorMsg("Please confirm your email address before signing in. Check your inbox for a confirmation link.")
+              setLoading(false)
+              return
+            }
+            setErrorMsg(signInRes.error.message)
+            setLoading(false)
+            return
+          }
+          finalSession = signInRes.data?.session ?? null
+        } catch (e) {
+          console.warn("Auto sign-in after signup failed:", e)
+        }
+      }
+
+      // If we have a session now, navigate to dashboard. Otherwise route to login with a notice.
+      if (finalSession) {
+        router.push("/dashboard")
+      } else {
+        // No session: likely email confirmation required. Go to login and show notice.
+        setErrorMsg("Account created. Please confirm your email or sign in to continue.")
+        router.push("/login")
+      }
     } catch (err: any) {
       setErrorMsg(err?.message ?? String(err))
     } finally {
