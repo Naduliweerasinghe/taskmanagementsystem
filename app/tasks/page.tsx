@@ -308,38 +308,47 @@ export default function TasksPage() {
           onCancelAction={cancelDelete}
         />
       )}
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
-        <div className="flex items-center justify-between mb-6">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Tasks</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Your tasks and lists.</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100">Tasks</h1>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Your tasks and lists.</p>
             {/* Remaining tasks count */}
-            <div className="mt-1 text-sm text-gray-700 dark:text-gray-300">{remainingCount} remaining</div>
+            <div className="mt-1 text-xs sm:text-sm text-gray-700 dark:text-gray-300">{remainingCount} remaining</div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Link href="/tasks/add" className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Add Task</Link>
-            <Link href="/tasks/create-list" className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Create List</Link>
-            <Link href="/tasks/completed" className="inline-flex items-center px-4 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600">Completed Task</Link>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <Link href="/tasks/add" className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-green-600 text-white rounded-md hover:bg-green-700 whitespace-nowrap">
+              <span className="hidden xs:inline">Add Task</span>
+              <span className="xs:hidden">Add</span>
+            </Link>
+            <Link href="/tasks/create-list" className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 whitespace-nowrap">
+              <span className="hidden xs:inline">Create List</span>
+              <span className="xs:hidden">List</span>
+            </Link>
+            <Link href="/tasks/completed" className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-emerald-500 text-white rounded-md hover:bg-emerald-600 whitespace-nowrap">
+              <span className="hidden sm:inline">Completed</span>
+              <span className="sm:hidden">✓</span>
+            </Link>
             {/* debug helper removed */}
           </div>
         </div>
 
-        <section className="space-y-6">
+        <section className="space-y-4 sm:space-y-6">
           <div>
             {loading ? (
-              <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Lists</h2>
-                <div className="text-gray-600">Loading lists…</div>
+              <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-4 sm:p-6 shadow-sm">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 sm:mb-4">Lists</h2>
+                <div className="text-sm sm:text-base text-gray-600">Loading lists…</div>
               </div>
             ) : lists.length === 0 ? (
-              <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Lists</h2>
-                <div className="text-gray-600">No lists yet. Create one to organize tasks.</div>
+              <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-4 sm:p-6 shadow-sm">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 sm:mb-4">Lists</h2>
+                <div className="text-sm sm:text-base text-gray-600">No lists yet. Create one to organize tasks.</div>
               </div>
             ) : lists.length === 1 ? (
-              <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">{lists[0].name}</h2>
+              <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-4 sm:p-6 shadow-sm">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 sm:mb-4">{lists[0].name}</h2>
                 {tasksByList[lists[0].id] && tasksByList[lists[0].id].length > 0 ? (
                   <ul className="space-y-2">
                     {tasksByList[lists[0].id].map((t) => {
@@ -348,7 +357,7 @@ export default function TasksPage() {
                           return (
                           <li
                             key={t.id}
-                            className={`p-2 rounded-md ${liBg} border flex items-start gap-3 cursor-pointer`}
+                            className={`p-2 sm:p-3 rounded-md ${liBg} border flex items-start gap-2 sm:gap-3 cursor-pointer hover:shadow-sm transition-shadow`}
                             onClick={() => router.push(`/tasks/${t.id}`)}
                           >
                             <input
@@ -357,11 +366,11 @@ export default function TasksPage() {
                               onClick={(e) => e.stopPropagation()}
                               onChange={() => toggleSelectTask(t.id)}
                               checked={selectedTaskIds.includes(t.id)}
-                              className="mt-1 h-4 w-4"
+                              className="mt-0.5 sm:mt-1 h-4 w-4 flex-shrink-0"
                             />
-                            <div>
-                              <div className="font-medium text-gray-800 dark:text-gray-100">{t.name}</div>
-                              {t.description ? <div className="text-sm text-gray-600 dark:text-gray-300">{t.description}</div> : null}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base text-gray-800 dark:text-gray-100 break-words">{t.name}</div>
+                              {t.description ? <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 break-words">{t.description}</div> : null}
                               {t.due_date ? (
                                 <div className={`text-xs mt-1 ${dueSoon ? 'text-red-700 dark:text-red-300' : 'text-gray-600 dark:text-gray-300'}`}>
                                   Due: {new Date(t.due_date).toLocaleString()}
@@ -373,16 +382,16 @@ export default function TasksPage() {
                         })}
                   </ul>
                 ) : (
-                  <div className="text-sm text-gray-600 dark:text-gray-300">(No tasks in this list yet)</div>
+                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">(No tasks in this list yet)</div>
                 )}
                 <div className="text-xs text-gray-500 mt-2">{lists[0].created_at ? new Date(lists[0].created_at).toLocaleString() : ""}</div>
               </div>
             ) : (
               <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {lists.map((l) => (
-                  <section key={l.id} className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-6 shadow-sm">
-                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">{l.name}</h2>
+                  <section key={l.id} className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-4 sm:p-6 shadow-sm">
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">{l.name}</h2>
                     {tasksByList[l.id] && tasksByList[l.id].length > 0 ? (
                       <ul className="space-y-2">
                         {tasksByList[l.id].map((t) => {
@@ -391,7 +400,7 @@ export default function TasksPage() {
                           return (
                           <li
                             key={t.id}
-                            className={`p-2 rounded-md ${liBg} border flex items-start gap-3 cursor-pointer`}
+                            className={`p-2 sm:p-3 rounded-md ${liBg} border flex items-start gap-2 sm:gap-3 cursor-pointer hover:shadow-sm transition-shadow`}
                             onClick={() => router.push(`/tasks/${t.id}`)}
                           >
                             <input
@@ -400,11 +409,11 @@ export default function TasksPage() {
                               onClick={(e) => e.stopPropagation()}
                               onChange={() => toggleSelectTask(t.id)}
                               checked={selectedTaskIds.includes(t.id)}
-                              className="mt-1 h-4 w-4"
+                              className="mt-0.5 sm:mt-1 h-4 w-4 flex-shrink-0"
                             />
-                            <div>
-                              <div className="font-medium text-gray-800 dark:text-gray-100">{t.name}</div>
-                              {t.description ? <div className="text-sm text-gray-600 dark:text-gray-300">{t.description}</div> : null}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base text-gray-800 dark:text-gray-100 break-words">{t.name}</div>
+                              {t.description ? <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 break-words">{t.description}</div> : null}
                               {t.due_date ? (
                                 <div className={`text-xs mt-1 ${dueSoon ? 'text-red-700 dark:text-red-300' : 'text-gray-600 dark:text-gray-300'}`}>
                                   Due: {new Date(t.due_date).toLocaleString()}
@@ -416,7 +425,7 @@ export default function TasksPage() {
                         })}
                       </ul>
                     ) : (
-                      <div className="text-sm text-gray-600 dark:text-gray-300">(No tasks in this list yet)</div>
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">(No tasks in this list yet)</div>
                     )}
                     <div className="text-xs text-gray-500 mt-2">{l.created_at ? new Date(l.created_at).toLocaleString() : ""}</div>
                   </section>
@@ -429,9 +438,9 @@ export default function TasksPage() {
         </section>
         {/* Unlisted tasks (no list_id) */}
         {tasksByList["__nolst__"] && tasksByList["__nolst__"].length > 0 ? (
-          <div className="max-w-6xl mx-auto px-4 md:px-8 py-4">
-            <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Unlisted Tasks</h2>
+          <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-8 py-4">
+            <div className="bg-white/80 dark:bg-slate-800/60 rounded-lg p-4 sm:p-6 shadow-sm">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Unlisted Tasks</h2>
               <ul className="space-y-2">
                 {tasksByList["__nolst__"].map((t) => {
                   const dueSoon = isDueSoon(t.due_date)
@@ -439,7 +448,7 @@ export default function TasksPage() {
                   return (
                   <li
                     key={t.id}
-                    className={`p-2 rounded-md ${liBg} border flex items-start gap-3 cursor-pointer`}
+                    className={`p-2 sm:p-3 rounded-md ${liBg} border flex items-start gap-2 sm:gap-3 cursor-pointer hover:shadow-sm transition-shadow`}
                     onClick={() => router.push(`/tasks/${t.id}`)}
                   >
                     <input
@@ -448,11 +457,11 @@ export default function TasksPage() {
                       onClick={(e) => e.stopPropagation()}
                       onChange={() => toggleSelectTask(t.id)}
                       checked={selectedTaskIds.includes(t.id)}
-                      className="mt-1 h-4 w-4"
+                      className="mt-0.5 sm:mt-1 h-4 w-4 flex-shrink-0"
                     />
-                    <div>
-                      <div className="font-medium text-gray-800 dark:text-gray-100">{t.name}</div>
-                      {t.description ? <div className="text-sm text-gray-600 dark:text-gray-300">{t.description}</div> : null}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm sm:text-base text-gray-800 dark:text-gray-100 break-words">{t.name}</div>
+                      {t.description ? <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 break-words">{t.description}</div> : null}
                       {t.due_date ? (
                         <div className={`text-xs mt-1 ${dueSoon ? 'text-red-700 dark:text-red-300' : 'text-gray-600 dark:text-gray-300'}`}>
                           Due: {new Date(t.due_date).toLocaleString()}
@@ -468,12 +477,12 @@ export default function TasksPage() {
         ) : null}
         {/* Bulk complete action button - appears when tasks are selected */}
         {selectedTaskIds.length > 0 ? (
-          <div className="fixed bottom-6 left-0 right-0 flex justify-center z-50">
-            <div className="inline-flex items-center gap-3">
+          <div className="fixed bottom-4 sm:bottom-6 left-0 right-0 flex justify-center z-50 px-3">
+            <div className="inline-flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto max-w-sm sm:max-w-none">
               <button
                 onClick={completeSelectedTasks}
                 disabled={bulkLoading}
-                className="inline-flex items-center px-5 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 disabled:opacity-60"
+                className="inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-3 text-sm sm:text-base bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 disabled:opacity-60 whitespace-nowrap"
               >
                 {bulkLoading ? "Completing..." : `Complete (${selectedTaskIds.length})`}
               </button>
@@ -481,7 +490,7 @@ export default function TasksPage() {
               <button
                 onClick={handleDeleteClick}
                 disabled={deleteLoading}
-                className="inline-flex items-center px-5 py-3 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 disabled:opacity-60"
+                className="inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-3 text-sm sm:text-base bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 disabled:opacity-60 whitespace-nowrap"
               >
                 {deleteLoading ? "Deleting..." : `Delete (${selectedTaskIds.length})`}
               </button>
@@ -492,7 +501,7 @@ export default function TasksPage() {
         <button
           type="button"
           onClick={() => router.push('/dashboard')}
-          className="fixed bottom-6 left-4 md:left-8 lg:left-[calc(50%-36rem+2rem)] z-50 inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow hover:bg-gray-300"
+          className="fixed bottom-4 sm:bottom-6 left-3 sm:left-4 md:left-8 lg:left-[calc(50%-36rem+2rem)] z-40 inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-gray-200 text-gray-800 rounded-md shadow hover:bg-gray-300"
         >
           Back
         </button>

@@ -10,6 +10,7 @@ export default function NavBar() {
   const pathname = usePathname() || "/"
   const router = useRouter()
   const [session, setSession] = useState<any | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -87,21 +88,23 @@ export default function NavBar() {
     <header className="w-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3">
               {/* logo - user will add logo.png to public */}
-              <Image src="/Logo.png" alt="logo" width={40} height={40} className="rounded-md object-contain" />
-              <span className="font-semibold text-lg text-gray-800 dark:text-gray-100">Task Management System</span>
+              <Image src="/Logo.png" alt="logo" width={32} height={32} className="sm:w-10 sm:h-10 rounded-md object-contain" />
+              <span className="font-semibold text-sm sm:text-base lg:text-lg text-gray-800 dark:text-gray-100 hidden xs:inline">Task Management System</span>
+              <span className="font-semibold text-sm text-gray-800 dark:text-gray-100 xs:hidden">Task Management System</span>
             </Link>
-            <div className="hidden sm:flex items-center ml-4 text-sm text-gray-600 dark:text-gray-300 absolute left-1/2 transform -translate-x-1/2 z-10 pointer-events-none">
+            <div className="hidden md:flex items-center ml-4 text-sm text-gray-600 dark:text-gray-300 absolute left-1/2 transform -translate-x-1/2 z-10 pointer-events-none">
               <span className="inline-flex items-center text-gray-700 dark:text-gray-200 pointer-events-auto">{meta.icon}<span className="align-middle">{meta.name}</span></span>
             </div>
           </div>
 
-          <nav className="flex items-center gap-3">
+          {/* Desktop Navigation */}
+          <nav className="hidden sm:flex items-center gap-2 sm:gap-3">
             {/* Primary links - only show when user is logged in */}
             {session && (
-              <div className="hidden sm:flex items-center gap-2 mr-2">
+              <div className="flex items-center gap-2 mr-2">
                 <Link href="/dashboard" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/dashboard") ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>
                   Dashboard
                 </Link>
@@ -126,7 +129,82 @@ export default function NavBar() {
               </>
             )}
           </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="sm:hidden p-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden border-t border-gray-200 dark:border-slate-700 py-4">
+            <nav className="flex flex-col space-y-2">
+              {/* Mobile navigation links for logged in users */}
+              {session && (
+                <>
+                  <Link 
+                    href="/dashboard" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium ${isActive("/dashboard") ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link 
+                    href="/tasks" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium ${isActive("/tasks") ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}
+                  >
+                    Tasks
+                  </Link>
+                  <button 
+                    onClick={() => {
+                      setMobileMenuOpen(false)
+                      handleLogout()
+                    }} 
+                    className="px-4 py-2 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600 text-left"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
+
+              {/* Mobile navigation links for logged out users */}
+              {!session && (
+                <>
+                  <Link 
+                    href="/login" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-2 rounded-md text-sm font-medium bg-blue-500 text-white hover:bg-blue-600"
+                  >
+                    Sign In
+                  </Link>
+                  {pathname === "/" && (
+                    <Link 
+                      href="/signup" 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="px-4 py-2 rounded-md text-sm font-medium bg-yellow-500 text-white hover:bg-yellow-600"
+                    >
+                      Sign Up
+                    </Link>
+                  )}
+                </>
+              )}
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   )
