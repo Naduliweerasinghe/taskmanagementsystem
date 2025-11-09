@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { supabase } from "../../lib/supabase"
+import Toast from "../../components/toast"
+import ConfirmDialog from "../../components/confirm-dialog"
 
 type List = {
   id: string
@@ -21,6 +23,11 @@ type Task = {
   due_date?: string | null
 }
 
+type ToastType = {
+  message: string
+  type: "success" | "error" | "info" | "warning"
+}
+
 export default function TasksPage() {
   const router = useRouter()
   const [lists, setLists] = useState<List[]>([])
@@ -30,6 +37,8 @@ export default function TasksPage() {
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
   const [bulkLoading, setBulkLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [toast, setToast] = useState<ToastType | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const fetchLists = async (userId: string | null) => {
     setLoading(true)
@@ -135,18 +144,31 @@ export default function TasksPage() {
 
       // clear selection
       setSelectedTaskIds([])
+      
+      // Show success notification
+      setToast({ 
+        message: `${updatedIds.length} task(s) marked as completed!`, 
+        type: "success" 
+      })
     } catch (e) {
       console.error("Failed to complete selected tasks:", e)
-      alert("Failed to complete tasks. See console for details.")
+      setToast({ message: "Failed to complete tasks. Please try again.", type: "error" })
     } finally {
       setBulkLoading(false)
     }
   }
 
-  const deleteSelectedTasks = async () => {
+  const handleDeleteClick = () => {
     if (selectedTaskIds.length === 0) return
-    if (!confirm(`Delete ${selectedTaskIds.length} selected task(s)? This cannot be undone.`)) return
+    setShowDeleteConfirm(true)
+  }
+
+  const confirmDelete = async () => {
+    setShowDeleteConfirm(false)
     setDeleteLoading(true)
+    
+    const taskCount = selectedTaskIds.length
+    
     try {
       const { error } = await supabase.from('tasks').delete().in('id', selectedTaskIds)
       if (error) throw error
@@ -162,12 +184,22 @@ export default function TasksPage() {
 
       // clear selection
       setSelectedTaskIds([])
+      
+      // Show success notification
+      setToast({ 
+        message: `${taskCount} task${taskCount > 1 ? 's' : ''} deleted successfully!`, 
+        type: "success" 
+      })
     } catch (e) {
       console.error('Failed to delete selected tasks:', e)
-      alert('Failed to delete tasks. See console for details.')
+      setToast({ message: 'Failed to delete tasks. Please try again.', type: "error" })
     } finally {
       setDeleteLoading(false)
     }
+  }
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false)
   }
 
   useEffect(() => {
@@ -258,6 +290,24 @@ export default function TasksPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onCloseAction={() => setToast(null)}
+        />
+      )}
+      {showDeleteConfirm && (
+        <ConfirmDialog
+          title="Delete Tasks"
+          message={`Are you sure you want to delete ${selectedTaskIds.length} selected task${selectedTaskIds.length > 1 ? 's' : ''}? This action is permanent and cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          onConfirmAction={confirmDelete}
+          onCancelAction={cancelDelete}
+        />
+      )}
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -429,7 +479,7 @@ export default function TasksPage() {
               </button>
 
               <button
-                onClick={deleteSelectedTasks}
+                onClick={handleDeleteClick}
                 disabled={deleteLoading}
                 className="inline-flex items-center px-5 py-3 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 disabled:opacity-60"
               >

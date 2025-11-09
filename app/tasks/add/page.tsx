@@ -3,6 +3,12 @@
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "../../../lib/supabase"
+import Toast from "../../../components/toast"
+
+type ToastType = {
+  message: string
+  type: "success" | "error" | "info" | "warning"
+}
 
 export default function AddTaskPage() {
   const router = useRouter()
@@ -15,6 +21,7 @@ export default function AddTaskPage() {
   const [selectedList, setSelectedList] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [session, setSession] = useState<any | null>(null)
+  const [toast, setToast] = useState<ToastType | null>(null)
 
   useEffect(() => {
     let mounted = true
@@ -69,11 +76,16 @@ export default function AddTaskPage() {
         throw error
       }
 
-      // On success, navigate back to tasks list
-      router.push("/tasks")
+      // Show success notification
+      setToast({ message: "Task added successfully!", type: "success" })
+      
+      // Navigate back to tasks list after a brief delay
+      setTimeout(() => {
+        router.push("/tasks")
+      }, 1500)
     } catch (err: any) {
       console.error("Add task failed:", err)
-      alert(err?.message ?? "Failed to add task")
+      setToast({ message: err?.message ?? "Failed to add task", type: "error" })
     } finally {
       setLoading(false)
     }
@@ -81,6 +93,13 @@ export default function AddTaskPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onCloseAction={() => setToast(null)}
+        />
+      )}
       <div className="max-w-3xl mx-auto px-4 md:px-8 py-8">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Add Task</h1>
 

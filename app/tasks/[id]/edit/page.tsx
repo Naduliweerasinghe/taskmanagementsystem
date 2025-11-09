@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
 import { supabase } from "../../../../lib/supabase"
+import Toast from "../../../../components/toast"
 
 type Task = {
   id: string
@@ -15,6 +16,11 @@ type Task = {
   due_date?: string | null
 }
 
+type ToastType = {
+  message: string
+  type: "success" | "error" | "info" | "warning"
+}
+
 export default function EditTaskPage() {
   const router = useRouter()
   const params: any = (typeof useParams === "function" ? useParams() : {})
@@ -22,6 +28,7 @@ export default function EditTaskPage() {
 
   const [task, setTask] = useState<Task | null>(null)
   const [saving, setSaving] = useState(false)
+  const [toast, setToast] = useState<ToastType | null>(null)
   // react-hook-form manages form state
   type FormValues = {
     name: string
@@ -67,7 +74,7 @@ export default function EditTaskPage() {
   const onSubmit = async (values: FormValues) => {
     if (!id) return
     if (!values.name || !values.name.trim()) {
-      alert("Please provide a task name")
+      setToast({ message: "Please provide a task name", type: "warning" })
       return
     }
     setSaving(true)
@@ -81,10 +88,17 @@ export default function EditTaskPage() {
         console.error("Supabase update error:", error)
       }
       if (error) throw error
-      router.push(`/tasks/${id}`)
+      
+      // Show success notification
+      setToast({ message: "Task updated successfully!", type: "success" })
+      
+      // Navigate back after a brief delay
+      setTimeout(() => {
+        router.push(`/tasks/${id}`)
+      }, 1500)
     } catch (e) {
       console.error("Failed to update task:", e)
-      alert("Failed to update task. See console for details.")
+      setToast({ message: "Failed to update task. Please try again.", type: "error" })
     } finally {
       setSaving(false)
     }
@@ -95,6 +109,13 @@ export default function EditTaskPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onCloseAction={() => setToast(null)}
+        />
+      )}
       <div className="max-w-3xl mx-auto px-4 md:px-8 py-8">
         <div className="mb-4 flex items-center gap-3">
           <Link href={`/tasks/${id}`} className="text-sm text-indigo-600 hover:underline">← Back to details</Link>

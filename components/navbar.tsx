@@ -99,15 +99,17 @@ export default function NavBar() {
           </div>
 
           <nav className="flex items-center gap-3">
-            {/* Primary links */}
-            <div className="hidden sm:flex items-center gap-2 mr-2">
-              <Link href="/dashboard" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/dashboard") ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>
-                Dashboard
-              </Link>
-              <Link href="/tasks" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/tasks") ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>
-                Tasks
-              </Link>
-            </div>
+            {/* Primary links - only show when user is logged in */}
+            {session && (
+              <div className="hidden sm:flex items-center gap-2 mr-2">
+                <Link href="/dashboard" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/dashboard") ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>
+                  Dashboard
+                </Link>
+                <Link href="/tasks" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/tasks") ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'}`}>
+                  Tasks
+                </Link>
+              </div>
+            )}
             {!session ? (
               // logged out: on home show sign in/up, else show sign in
               pathname === "/" ? (
