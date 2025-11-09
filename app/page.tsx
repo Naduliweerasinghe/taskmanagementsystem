@@ -54,7 +54,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
   {/* Hero */}
-  <header className="pt-4 sm:pt-6 pb-8 sm:pb-12">
+  <header className="pt-0 pb-0 sm:pb-12">
         <div className="w-full text-center mx-auto px-3 sm:px-4">
           <div className="w-full p-4 sm:p-8 md:p-12 lg:p-16 rounded-xl sm:rounded-2xl bg-white/95 dark:bg-slate-900/80 shadow-xl backdrop-blur-md">
             <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 w-full">
