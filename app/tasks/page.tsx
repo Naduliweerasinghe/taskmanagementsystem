@@ -475,10 +475,19 @@ export default function TasksPage() {
             </div>
           </div>
         ) : null}
+        {/* Back button (fixed bottom-left) - moved before action buttons to prevent overlap */}
+        <button
+          type="button"
+          onClick={() => router.push('/dashboard')}
+          className="fixed bottom-4 sm:bottom-6 left-3 sm:left-4 md:left-8 lg:left-[calc(50%-36rem+2rem)] z-50 inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-md shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+        >
+          ← Back
+        </button>
         {/* Bulk complete action button - appears when tasks are selected */}
         {selectedTaskIds.length > 0 ? (
-          <div className="fixed bottom-4 sm:bottom-6 left-0 right-0 flex justify-center z-50 px-3">
-            <div className="inline-flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto max-w-sm sm:max-w-none">
+          <div className="fixed bottom-4 sm:bottom-6 left-0 right-0 flex justify-center z-40 px-3">
+            {/* Add left padding on mobile to avoid overlap with Back button */}
+            <div className="inline-flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto max-w-sm sm:max-w-none pl-20 sm:pl-0">
               <button
                 onClick={completeSelectedTasks}
                 disabled={bulkLoading}
@@ -497,14 +506,6 @@ export default function TasksPage() {
             </div>
           </div>
         ) : null}
-        {/* Back button (fixed bottom-left) */}
-        <button
-          type="button"
-          onClick={() => router.push('/dashboard')}
-          className="fixed bottom-4 sm:bottom-6 left-3 sm:left-4 md:left-8 lg:left-[calc(50%-36rem+2rem)] z-40 inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-gray-200 text-gray-800 rounded-md shadow hover:bg-gray-300"
-        >
-          Back
-        </button>
       </div>
     </div>
   )
