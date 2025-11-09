@@ -54,7 +54,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
   {/* Hero */}
-  <header className="mt-2 sm:mt-4 min-h-screen flex items-center py-8 sm:py-12">
+  <header className="pt-4 sm:pt-6 pb-8 sm:pb-12">
         <div className="w-full text-center mx-auto px-3 sm:px-4">
           <div className="w-full p-4 sm:p-8 md:p-12 lg:p-16 rounded-xl sm:rounded-2xl bg-white/95 dark:bg-slate-900/80 shadow-xl backdrop-blur-md">
             <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 w-full">
@@ -129,7 +129,7 @@ export default function HomePage() {
 
       {/* Content sections */}
       <main className="max-w-6xl mx-auto px-3 sm:px-4 md:px-8">
-        <section className="py-8 sm:py-12 md:py-20 relative overflow-hidden">
+        <section className="py-6 sm:py-8 md:py-12 relative overflow-hidden">
           {/* decorative orange blob */}
           <div className="absolute -top-8 -right-16 w-56 h-56 bg-orange-200/40 dark:bg-orange-500/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
